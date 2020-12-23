@@ -1,0 +1,6 @@
+---
+ansible_user: test
+
+mysql_password: 1234567QweRTy
+PHP_mods_enable: false
+

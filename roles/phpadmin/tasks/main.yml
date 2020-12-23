@@ -1,0 +1,20 @@
+---
+# Setup/install tasks.
+- name: ensure phpmyadmin package is installed
+  package:
+    name: phpmyadmin
+    state: present
+  tags:
+    - install-phpmyadmin
+
+- name: Include OS-specific variables.
+  include_vars: "{{ ansible_os_family }}.yml"
+
+- include_tasks: setup-RedHat.yml
+  when: ansible_os_family == 'RedHat'
+
+- include_tasks: setup-Debian.yml
+  when: ansible_os_family == 'Debian'
+
+- include: nginx.yml
+

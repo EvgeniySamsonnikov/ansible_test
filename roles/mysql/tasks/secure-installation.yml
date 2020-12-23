@@ -1,0 +1,55 @@
+---
+- name: remove remote root
+  mysql_user:
+    check_implicit_admin: true
+    login_user: root
+    login_password: "{{ mysql_password }}"
+    user: root
+    host: "{{ ansible_fqdn }}"
+    state: absent
+
+# Set root password for MySQL >= 5.7.x.
+- name: Update MySQL root password for localhost root account (5.7.x).
+  shell: >
+    mysql -u root -NBe
+    'ALTER USER "{{ mysql_root_username }}"@"{{ item }}"
+    IDENTIFIED WITH mysql_native_password BY "{{ mysql_password }}";'
+  with_items: "{{ mysql_root_hosts.stdout_lines|default([]) }}"
+  when: >
+    ((mysql_install_packages | bool) or mysql_password_update)
+    and ('5.7.' in mysql_cli_version.stdout or '8.0.' in mysql_cli_version.stdout)
+
+# Set root password for MySQL < 5.7.x.
+- name: Update MySQL root password for localhost root account (< 5.7.x).
+  shell: >
+    mysql -NBe
+    'SET PASSWORD FOR "{{ mysql_root_username }}"@"{{ item }}" = PASSWORD("{{ mysql_password }}");'
+  with_items: "{{ mysql_root_hosts.stdout_lines|default([]) }}"
+  when: >
+    ((mysql_install_packages | bool) or mysql_password_update)
+    and ('5.7.' not in mysql_cli_version.stdout and '8.0.' not in mysql_cli_version.stdout)
+
+- name: mysql_password
+  mysql_user:
+    login_user: root
+    login_password: "{{ mysql_password }}"
+    user: root
+    check_implicit_admin: true
+    password: "{{ mysql_password }}"
+    host: localhost
+
+- name: Removes all anonymous user accounts
+  mysql_user:
+    name: ''
+    host_all: yes
+    state: absent
+    login_user: root
+    login_password: "{{ mysql_password }}"
+
+- name: Removes the MySQL test database
+  mysql_db:
+    name: test
+    state: absent
+    login_user: root
+    login_password: "{{ mysql_password }}"
+

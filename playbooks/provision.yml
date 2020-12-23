@@ -1,0 +1,12 @@
+---
+- name: Install all packages on Server
+  hosts: test
+  become: yes
+  roles:
+    - "mysql"
+    - "nginx"
+    - "php"
+    - "redis"
+    - "composer"
+    - "phpadmin"
+    - "redisadmin"

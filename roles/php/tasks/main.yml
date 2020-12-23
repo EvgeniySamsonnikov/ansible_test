@@ -1,0 +1,34 @@
+---
+# Variable setup.
+- name: Include distribution and version-specific vars.
+  include_vars: "{{ item }}"
+  with_first_found:
+    - files:
+        - "{{ ansible_distribution }}-{{ ansible_distribution_major_version }}.yml"
+      skip: true
+  tags:
+    - install_php
+
+- name: Set the default PHP version for Debian-based OSes.
+  set_fact:
+    php_default_version_debian: "{{ __php_default_version_debian }}"
+  when: ansible_os_family == 'Debian'
+
+- name: Include OS-specific variables.
+  include_vars: "{{ ansible_os_family }}.yml"
+
+- name: Define php_packages.
+  set_fact:
+    php_packages: "{{ __php_packages | list }}"
+  when: php_packages is not defined
+  tags:
+    - install_php
+
+- include_tasks: setup-RedHat.yml
+  when:
+    - ansible_os_family == 'RedHat'
+
+- include_tasks: setup-Debian.yml
+  when:
+    - ansible_os_family == 'Debian'
+

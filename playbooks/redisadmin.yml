@@ -1,0 +1,8 @@
+---
+- name: Install RedisAdmin
+  hosts: test
+#  become: yes
+  roles:
+   - "redisadmin"
+
+

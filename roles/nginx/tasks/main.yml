@@ -1,0 +1,15 @@
+---
+# tasks file for nginx
+- include_tasks: setup-RedHat.yml
+  when: ansible_os_family == 'RedHat'
+
+- include_tasks: setup-Debian.yml
+  when: ansible_os_family == 'Debian'
+
+- name: Ensure Nginx is running and and enabled to start automatically on reboots
+  systemd:
+    name: nginx
+    enabled: yes
+    state: started
+  tags:
+    - install-nginx

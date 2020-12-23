@@ -1,0 +1,26 @@
+---
+- name: Enable nginx repo for RedHat
+  template:
+    src: nginx.repo.j2
+    dest: /etc/yum.repos.d/nginx.repo
+    owner: root
+    group: root
+    mode: 0644
+  tags:
+    - install-nginx-rh
+
+- name: Install nginx on server
+  package:
+    name: nginx
+    state: present
+    update_cache: true
+  tags:
+    - install-nginx
+
+- name: Remove default nginx config file.
+  file:
+    path: "/etc/nginx/conf.d/default.conf"
+    state: absent
+  notify: restart nginx
+  tags:
+    - install-nginx-rh

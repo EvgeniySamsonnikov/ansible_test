@@ -1,0 +1,49 @@
+---
+# tasks file for composer
+
+- name: Check if Composer is installed.
+  stat: 
+    path: /usr/local/bin/composer
+  register: composer_bin
+  tags:
+    - check-composer
+
+- name: Download Composer
+  get_url:
+    url: https://getcomposer.org/installer
+    dest: /tmp/composer-setup.php
+    force: no
+  when: not composer_bin.stat.exists
+  tags:
+    - download-composer
+
+- name: install Composer
+  shell: php /tmp/composer-setup.php
+  when: not composer_bin.stat.exists
+  tags:
+    - instal-composer
+
+- name: Debug
+  set_fact:
+    composer_src: "/home/{{ansible_user}}/composer.phar"
+  register: composer_src
+  tags:
+    - register-composer-path
+
+- name: move and rename Composer 
+  copy:
+    remote_src: true
+    src: "{{composer_src}}"
+    dest: /usr/local/bin/composer
+    force: no
+  tags:
+    - move-composer-bin
+
+- name: change mode
+  file:
+    path: /usr/local/bin/composer
+    mode: '0777'
+  tags:
+    - composer-executeble
+
+    

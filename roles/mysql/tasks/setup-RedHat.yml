@@ -1,0 +1,8 @@
+---
+- name: Ensure MySQL packages are installed.
+  yum:
+    name: "{{ mysql_packages }}"
+    state: present
+  register: rh_mysql_install_packages
+  tags:
+    - mysql-install-rh

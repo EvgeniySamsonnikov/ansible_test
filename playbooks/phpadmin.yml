@@ -1,0 +1,8 @@
+---
+- name: Install PHPMyAdmin
+  hosts: test
+  become: yes
+  roles:
+   - "phpadmin"
+
+

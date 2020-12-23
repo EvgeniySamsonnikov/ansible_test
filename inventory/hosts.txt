@@ -1,0 +1,39 @@
+[default]
+127.0.0.1 ansible_connection=local
+
+[vm_ubuntu]
+ubuntu20 ansible_host=192.168.5.195
+#ubuntu18 ansible_host=192.168.5.139
+
+[vm_fedora]
+contOS ansible_host=192.168.5.199
+
+[VMware:children]
+vm_ubuntu
+vm_fedora
+
+[aws_ubuntu]
+#ubuntu ansible_host=18.198.188.158
+#3.125.53.78
+
+[aws_redhat]
+redhat ansible_host=52.29.137.158
+#18.184.216.118
+
+[aws:children]
+aws_ubuntu
+aws_redhat
+
+[deb:children]
+aws_ubuntu
+vm_ubuntu
+
+[yum:children]
+aws_redhat
+vm_fedora
+
+[test:children]
+#aws
+vm_fedora
+vm_ubuntu
+

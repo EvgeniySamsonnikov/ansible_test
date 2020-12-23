@@ -1,0 +1,15 @@
+[www]
+listen = {{ __fpm_listner }}
+listen.allowed_clients = 127.0.0.1
+user = {{ __php_fpm_pool_user }}
+group = {{ __php_fpm_pool_group }}
+
+listen.owner = {{ __php_fpm_pool_user }}
+listen.group = {{ __php_fpm_pool_group }}
+
+pm = dynamic
+pm.max_children = 50
+pm.start_servers = 5
+pm.min_spare_servers = 5
+pm.max_spare_servers = 5
+pm.max_requests = 500

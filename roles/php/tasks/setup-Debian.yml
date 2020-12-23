@@ -1,0 +1,56 @@
+---
+- name: Update apt cache.
+  package: 
+    update_cache: yes 
+    cache_valid_time: 3600
+  tags:
+    - install_php_deb
+
+- name: repository | add
+  apt_repository:
+    repo: 'ppa:ondrej/php'
+    update_cache: true
+  tags:
+    - install_php_deb
+    - php-ondrej-repository-add
+
+- name: Ensure PHP packages are installed.
+  package:
+    name: "{{ php_packages }}"
+    state: present
+    install_recommends: true
+  tags:
+    - install_php_deb
+
+- name: Ensure PHP-mysql are installed.
+  package:
+    name: "php{{ php_default_version_debian }}-mysql"
+    state: present
+  tags:
+    - install_php_deb
+
+- name: Ensure PHP mods are installed (if enabled).
+  package:
+    name: "{{ __php_mods }}"
+    state: present
+  when: PHP_mods_enable
+  tags:
+    - install_php_deb
+    - install_php_mods_deb
+
+- name: Ensure PHP is running and and enabled to start automatically on reboots
+  systemd:
+    name: "{{ __php_fpm_daemon }}"
+    enabled: yes
+    state: started
+  tags:
+    - install-php_deb
+
+- name: copy www.conf
+  template:
+    src: www.conf.j2
+    dest: "{{ __php_fpm_pool_conf_path }}"
+  notify: restart php-fpm
+  tags:
+    - install_php_deb
+

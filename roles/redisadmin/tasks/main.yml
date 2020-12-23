@@ -1,0 +1,62 @@
+---
+#Install RedisAdmin
+- name: Check if Redisadmin is installed.
+  stat:
+    path: /var/www/redisadmin
+  register: redisadmin_present
+  tags:
+    - configure-redisadmin
+
+- name: Change mode
+  become: yes
+  file:
+    path: /var/www
+    state: directory
+    mode: '0777'
+  tags:
+    - configure-redisadmin
+
+- name: Create directory
+  file:
+    path: /var/www/redisadmin
+    state: directory
+    mode: '0777'
+  when: not redisadmin_present.stat.exists
+  tags:
+    - configure-redisadmin
+
+- name: Install Redisamin
+  become: no
+  composer:
+    command: create-project
+    arguments: erik-dubbelboer/php-redis-admin /var/www/redisadmin
+    working_dir: /var/www/redisadmin
+    prefer_dist: yes
+  when: not redisadmin_present.stat.exists
+  tags:
+    - install-redisadmin
+
+- name: Include OS-specific variables.
+  include_vars: "{{ ansible_os_family }}.yml"
+
+- name: Set the path to socket.
+  set_fact:
+    fpm_listner: "{{ __fpm_listner }}"
+
+- name: Generate web page
+  become: yes
+  template:
+    src: webpage.j2
+    dest: "/etc/nginx/conf.d/redisadmin.conf"
+    owner: root
+    group: root
+    mode: '0755'
+  when: not redisadmin_present.stat.exists
+  notify: reload nginx
+  tags:
+    - configure-redisadmin
+
+- name: add iptable rule
+  become: yes
+  command: /sbin/iptables -I INPUT 1 -p tcp --dport http -j ACCEPT -m comment --comment "Apache"
+  when: ansible_os_family == 'RedHat'

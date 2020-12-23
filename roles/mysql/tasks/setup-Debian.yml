@@ -1,0 +1,27 @@
+---
+- name: Check if MySQL is already installed.
+
+  stat: path=/etc/init.d/mysql
+  register: mysql_installed
+
+- name: Update apt cache if MySQL is not yet installed.
+  apt: update_cache=yes
+  when: not mysql_installed.stat.exists
+  tags:
+    - mysql-install-deb
+
+- name: Ensure MySQL Python libraries are installed.
+  apt:
+    name: python3-mysqldb
+    state: present
+  tags:
+    - mysql-install-deb
+
+- name: Ensure MySQL packages are installed.
+  apt:
+    name: "mysql-server"
+    state: present
+  register: deb_mysql_install_packages
+  tags:
+    - mysql-install-deb
+

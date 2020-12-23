@@ -1,0 +1,29 @@
+---
+
+- name: ensure phpmyadmin package is installed
+  package:
+    name: phpmyadmin
+    state: present
+  tags:
+    - install-phpmyadmin_deb
+
+- name: create link to /var/www
+  file:
+    src: /usr/share/phpmyadmin/
+    dest: /var/www/phpadmin
+    state: link
+    force: yes
+  tags:
+    - configure-phpmyadmin_deb
+
+- name: Remove config.inc.php file.
+  file:
+    path: "/etc/phpmyadmin/config.inc.php"
+    state: absent
+
+- name: ensure phpmyadmin configuration is installed
+  template:
+    src: config.php.j2
+    dest: /etc/phpmyadmin/conf.d/custom.php
+  tags:
+    - configure-phpmyadmin_deb

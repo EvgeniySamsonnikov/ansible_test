@@ -1,0 +1,13 @@
+---
+- name: Set the path to socket.
+  set_fact:
+    fpm_listner: "{{ __fpm_listner }}"
+
+- name: ensure phpmyadmin configuration for nginx is installed
+  template:
+    src: nginx.conf.j2
+    dest: /etc/nginx/conf.d/phpmyadmin.conf
+  notify: reload nginx
+  tags:
+    - configure-phpmyadmin
+

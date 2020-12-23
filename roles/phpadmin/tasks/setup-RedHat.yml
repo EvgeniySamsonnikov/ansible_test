@@ -1,0 +1,31 @@
+---
+- name: create link to /var/www
+  file:
+    src: /usr/share/phpMyAdmin/
+    dest: /var/www/phpadmin
+    state: link
+    force: yes
+  tags:
+    - configure-phpmyadmin_rh
+
+- name: install python-libs
+  package:
+    name: policycoreutils-python
+    state: present
+  tags:
+    - configure-phpmyadmin_rh
+
+- name: Set httpd_can_network_connect flag on and keep it persistent across reboots
+  seboolean:
+    name: httpd_can_network_connect
+    state: yes
+    persistent: yes
+  tags:
+    - configure-phpmyadmin_rh
+
+- name: ensure phpmyadmin configuration is installed
+  template:
+    src: config.php.j2
+    dest: /etc/phpMyAdmin/config.inc.php
+  tags:
+    - configure-phpmyadmin_rh

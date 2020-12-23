@@ -1,0 +1,3 @@
+---
+__fpm_listner: unix:/var/run/php/php-fpm.sock
+

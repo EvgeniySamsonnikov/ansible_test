@@ -1,0 +1,23 @@
+server {
+    listen 80;
+    server_name {{role_name}};
+
+    charset utf-8;
+    root /var/www;
+
+    access_log /var/log/nginx/{{role_name}}-access.log;
+    error_log /var/log/nginx/{{role_name}}-error.log;
+
+    location / {
+       index index.php;
+   }
+
+    location ~ [^/]\.php(/|$) {
+       include fastcgi_params;
+       fastcgi_index  index.php;
+       fastcgi_pass {{ fpm_listner }};
+       fastcgi_split_path_info ^(.+\.php)(/.*)$;
+       fastcgi_param       SCRIPT_FILENAME $document_root$fastcgi_script_name;
+   }
+
+}

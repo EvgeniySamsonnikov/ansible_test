@@ -1,0 +1,8 @@
+---
+- name: Install Redis Server
+  hosts: test
+  become: yes
+  roles:
+   - "redis"
+
+

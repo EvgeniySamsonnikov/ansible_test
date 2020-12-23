@@ -1,0 +1,5 @@
+---
+- name: Install composer
+  hosts: test
+  roles:
+   - "composer"

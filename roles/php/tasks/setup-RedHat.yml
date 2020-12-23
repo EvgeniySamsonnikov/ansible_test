@@ -1,0 +1,37 @@
+---
+
+- name: Set the path to socket.
+  set_fact:
+    fpm_listner: "{{ __fpm_listner }}"
+
+- name: Ensure PHP packages are installed.
+  package:
+    name: "{{ php_packages}}"
+    state: present
+  tags:
+    - install_php_rh
+
+- name: Ensure PHP mods are installed (if enabled).
+  package:
+    name: "{{ __php_mods }}"
+    state: present
+  when: PHP_mods_enable
+  tags:
+    - install_php_rh
+    - install_php_mods_rh
+
+- name: Ensure PHP is running and and enabled to start automatically on reboots
+  systemd:
+    name: "{{ __php_fpm_daemon }}"
+    enabled: yes
+    state: started
+  tags:
+    - install-php_rh
+
+- name: copy www.conf
+  template:
+    src: www.conf.j2
+    dest: "{{ __php_fpm_pool_conf_path }}"
+  notify: restart php-fpm
+  tags:
+    - install_php_rh
