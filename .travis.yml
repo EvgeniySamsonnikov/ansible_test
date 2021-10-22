@@ -11,7 +11,5 @@ jobs:
       if: branch = develop and type = push
       install:
         - sudo pip install ansible botocore boto3
-      before_script:
-        - cd deploy/ansible
       script:
         - echo "this is fake deploy to dev from master branch"
